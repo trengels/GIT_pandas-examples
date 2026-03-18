@@ -25,7 +25,10 @@ mergeRatings = pd.merge(pd.merge(users, ratings), movies)
 
 def cloneDF(df):
     a = pd.DataFrame(df.values.copy(), df.index.copy(), df.columns.copy())
-    return a.apply(pd.to_numeric, errors = 'ignore')
+    # Applique pd.to_numeric seulement si la colonne est de type objet
+    return a.apply(
+        lambda col: pd.to_numeric(col, errors='coerce') if col.dtype == "object" else col
+    )
 
 
 # Show Films with more votes. (groupby + sorted)
@@ -38,8 +41,8 @@ print('\n==================================================================\n')
 
 # Show avg ratings movie (groupby + avg)
 avgRatings = cloneDF(mergeRatings)
-avgRatings = avgRatings.groupby(['movie_id', 'title']).mean()
-print('Avg ratings: \n%s' % avgRatings['rating'][:10])
+avgRatings = avgRatings.groupby(['movie_id', 'title'])['rating'].mean()
+print('Avg ratings: \n%s' % avgRatings.head(10))
 print('\n==================================================================\n')
 
 
@@ -62,5 +65,5 @@ print('\n==================================================================\n')
 # Sort data ratings by created field (groupby + lambda function + sorted)
 sortRatingsField = cloneDF(mergeRatings)
 sortRatingsField = sortRatingsField.groupby(['movie_id', 'title'])['rating'].agg(
-    COUNT=np.size, myAVG=lambda x: x.sum() / float(x.count())).sort('COUNT', ascending=False)
+    COUNT=np.size, myAVG=lambda x: x.sum() / float(x.count())).sort_values('COUNT', ascending=False)
 print('My info sorted: \n%s' % sortRatingsField[:15])
