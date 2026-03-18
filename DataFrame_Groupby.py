@@ -28,6 +28,7 @@ def cloneDF(df):
     return a.astype(float, errors = 'ignore')# changement de la fonction
 
 
+
 # Show Films with more votes. (groupby + sorted)
 numberRatings = cloneDF(mergeRatings)
 numberRatings = numberRatings.groupby(
@@ -38,7 +39,9 @@ print('\n==================================================================\n')
 
 # Show avg ratings movie (groupby + avg)
 avgRatings = cloneDF(mergeRatings)
-avgRatings = avgRatings.groupby(['movie_id', 'title']).mean(numeric_only=True) # ajout de numeric_only=True
+avgRatings  = avgRatings.groupby(['movie_id', 'title'])[
+    'rating'].agg(['mean'])
+print('Avg ratings: \n%s' % avgRatings[0:10])
 print('\n==================================================================\n')
 
 
